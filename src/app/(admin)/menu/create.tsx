@@ -5,7 +5,12 @@ import Colors from "../../../constants/Colors";
 import Button from "../../../components/Button";
 import * as ImagePicker from "expo-image-picker";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useInsertProduct, useProduct, useUpdateProduct } from "@/api/products";
+import {
+  useDeleteProduct,
+  useInsertProduct,
+  useProduct,
+  useUpdateProduct,
+} from "@/api/products";
 
 const CreateScreen = () => {
   const [image, setImage] = useState<string | null>(null);
@@ -24,6 +29,7 @@ const CreateScreen = () => {
   const { data: updatedProduct, isLoading } = useProduct(id);
   const { mutate: insertProduct } = useInsertProduct();
   const { mutate: updateProduct } = useUpdateProduct();
+  const { mutate: deleteProduct } = useDeleteProduct();
 
   useEffect(() => {
     if (updatedProduct) {
@@ -117,7 +123,12 @@ const CreateScreen = () => {
   };
 
   const onDelete = () => {
-    console.warn("DELETE"!);
+    deleteProduct(id, {
+      onSuccess: () => {
+        resetFields();
+        router.replace("/(auth)");
+      },
+    });
   };
 
   return (
