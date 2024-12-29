@@ -5,6 +5,7 @@ import Colors from "../../../constants/Colors";
 import Button from "../../../components/Button";
 import * as ImagePicker from "expo-image-picker";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useInsertProduct } from "@/api/products";
 
 const CreateScreen = () => {
   const [image, setImage] = useState<string | null>(null);
@@ -16,6 +17,8 @@ const CreateScreen = () => {
   const isUpdating = !!id;
 
   const router = useRouter();
+
+  const { mutate: insertProduct } = useInsertProduct();
 
   const resetFields = () => {
     setName("");
@@ -47,16 +50,19 @@ const CreateScreen = () => {
     }
   };
 
-  const onCreate = () => {
+  const onCreate = async () => {
     if (!validateInput()) {
       return;
     }
-
-    console.warn("Creating dish");
-    setName("");
-    setPrice("");
-    setImage("");
-    router.back();
+    insertProduct(
+      { name, price: parseFloat(price), image },
+      {
+        onSuccess: () => {
+          resetFields();
+          router.back();
+        },
+      }
+    );
   };
 
   const onUpdate = () => {

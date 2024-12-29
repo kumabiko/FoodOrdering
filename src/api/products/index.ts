@@ -31,3 +31,27 @@ export const useProduct = (id: number) => {
     },
   });
 };
+
+export const useInsertProduct = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    async mutationFn(data: Omit<Product, "id">) {
+      const { error } = await supabase.from("products").insert({
+        name: data.name,
+        price: data.price,
+        image: data.image,
+      });
+
+      if (error) {
+        throw error;
+      }
+    },
+    async onSuccess() {
+      await queryClient.invalidateQueries(["products"]);
+    },
+    onError(error) {
+      console.log(error);
+    },
+  });
+};
